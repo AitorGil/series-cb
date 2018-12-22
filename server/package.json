@@ -1,0 +1,22 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AitorGil/series-cb.git"
+  },
+  "author": "Aitor Gil Callejo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AitorGil/series-cb/issues"
+  },
+  "homepage": "https://github.com/AitorGil/series-cb#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
