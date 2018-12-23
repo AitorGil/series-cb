@@ -1,5 +1,6 @@
 var expect = require("chai").expect;
 var request = require("request");
+var server = require("../index");
 
 const BASE_URL = "http://localhost:5000";
 
