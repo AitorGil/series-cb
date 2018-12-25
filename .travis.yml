@@ -6,4 +6,5 @@ cache:
     - node_modules
 script:
   - npm test
+  - pkill --signal SIGINT series-cb
   - npm run build
