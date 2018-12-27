@@ -2,59 +2,103 @@
   Test API calls
 */
 var expect = require("chai").expect;
-var request = require("request");
-var fetch = require("node-fetch");
-var server = require("../index");
+var chai = require("chai");
+var chaiHttp = require("chai-http");
+
+chai.use(chaiHttp);
+
+let server;
 
 const BASE_URL = "http://localhost:5000";
 
-const testUser = {
-  email: "prueba@codebreakers.com",
-  password: "prueba123"
+const requestBody = {
+  user: {
+    email: "prueba@codebreakers.com",
+    password: "prueba123"
+  }
 };
 
 describe("Sign Up Users", () => {
-  // Stop server after test
-  after(done => server.close(done));
+  let userToken;
 
-  it("Sign Up without user email and password", done => {
-    const requestData = {
-      headers: {
-        "content-type": "application/json"
-      },
-      body: {
-        user: testUser
-      },
-      method: "POST"
-    };
-
-    fetch(`${BASE_URL}/api/users`, requestData)
-      .then(data => {
-        return data.json();
-      })
-      .then(res => {
-        expect(res.statusCode).to.equal(400);
-        done();
-      })
-      .catch(err => {
-        done();
-      });
-
-    // request.post(
-    //   `${BASE_URL}/api/users`,
-    //   { user: {} },
-    //   (error, response, body) => {
-    //     expect(response.statusCode).to.equal(422);
-    //     //expect(body).to.equal("Hello World");
-    //     done();
-    //   }
-    // );
+  // Start server before test
+  before(() => {
+    server = require("../index");
   });
 
-  /*it("Main page status", done => {
-    request(`${BASE_URL}/api/users`, (error, response, body) => {
-      expect(response.statusCode).to.equal(422);
-      done();
-    });
-  });*/
+  // Stop server after test
+  after(done => {
+    process.kill(process.pid, "SIGTERM");
+    done();
+  });
+
+  it("Sign Up User", done => {
+    chai
+      .request(server)
+      .post("/api/users")
+      .send(requestBody)
+      .end((err, res) => {
+        // There should be no errors
+        expect(err).to.be.null;
+
+        // There should be a 201 status code
+        expect(res).to.have.status(201);
+
+        // There should be an user object in response body
+        expect(res.body).to.include.keys("user");
+
+        // The user object must have at least "_id", "email" and "token"
+        expect(res.body.user).to.include.keys("_id", "email", "token");
+
+        done();
+      });
+  });
+
+  it("Sign In User", done => {
+    chai
+      .request(server)
+      .post("/api/users/login")
+      .send(requestBody)
+      .end((err, res) => {
+        // There should be no errors
+        expect(err).to.be.null;
+
+        // There should be a 201 status code
+        expect(res).to.have.status(200);
+
+        // There should be an user object in response body
+        expect(res.body).to.include.keys("user");
+
+        // The user object must have at least "_id", "email" and "token"
+        expect(res.body.user).to.include.keys("_id", "email", "token");
+
+        userToken = res.body.user.token;
+
+        done();
+      });
+  });
+
+  it("Sign In User", done => {
+    chai
+      .request(server)
+      .get("/api/users/me")
+      .set("Authorization", `Token ${userToken}`)
+      .end((err, res) => {
+        // There should be no errors
+        expect(err).to.be.null;
+
+        // There should be a 201 status code
+        expect(res).to.have.status(200);
+
+        // There should be an user object in response body
+        expect(res.body).to.include.keys("user");
+
+        // The user object must have at least "_id", "email" and "token"
+        expect(res.body.user).to.include.keys("_id", "email", "token");
+
+        userToken = res.body.user.token;
+
+        done();
+      });
+  });
 });

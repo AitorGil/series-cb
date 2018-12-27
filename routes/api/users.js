@@ -87,7 +87,7 @@ router.post("/login", auth.optional, (req, res, next) => {
 });
 
 // GET current user
-router.get("/current", auth.required, async (req, res, next) => {
+router.get("/me", auth.required, async (req, res, next) => {
   const {
     payload: { id }
   } = req;
